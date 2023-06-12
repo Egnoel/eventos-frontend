@@ -2,8 +2,9 @@
 import Image from 'next/image';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { Event, fetchWrapper } from '@/app/functions/fetch';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const EventCard: React.FC<{ event: Event }> = ({
   event: {
@@ -13,39 +14,54 @@ const EventCard: React.FC<{ event: Event }> = ({
     eventDate,
     eventTime,
     eventpic,
-    id,
+    _id,
     title,
   },
 }) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
   const handleFavoriteClick = useCallback(async () => {
-    console.log(id);
+    console.log(token);
     try {
-      await fetchWrapper(`user/favorites/${id}`, {
-        method: 'POST',
+      await axios.post(`http://localhost:8000/api/user/favorites/${_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
       setIsFavorite(true);
       toast.success('Evento adicionado aos favoritos!');
     } catch (error: any) {
-      console.log(error.response.data); // Tratamento de erros, se necessário
+      console.log(error); // Tratamento de erros, se necessário
       toast.error('Ocorreu um erro ao adicionar o evento aos favoritos.');
     }
-  }, [id]);
+  }, [_id]);
 
   const handleRemoveFavoriteClick = useCallback(async () => {
-    console.log(id);
     try {
-      await fetchWrapper(`user/favorites/${id}`, {
-        method: 'DELETE',
+      await axios.delete(`user/favorites/${_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+
       setIsFavorite(false);
       toast.success('Evento removido dos favoritos!');
     } catch (error: any) {
       console.log(error.response.data); // Tratamento de erros, se necessário
       toast.error('Ocorreu um erro ao remover o evento dos favoritos.');
     }
-  }, [id]);
+  }, [_id]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setToken(JSON.parse(token));
+    }
+  }, []);
+
   return (
     <div className="flex flex-row w-full gap-12 px-5 py-5 bg-white border border-white shadow-xl rounded-xl hover:shadow-2xl h-[180px]">
       <div className="relative">
@@ -67,7 +83,7 @@ const EventCard: React.FC<{ event: Event }> = ({
         <h2 className="font-bold">{title}</h2>
         <p className="text-sm font-light text-gray-400">{description}</p>
         <div className="flex flex-row items-center gap-3">
-          <p>{creator.firstName}</p> {id}
+          <p>{creator.firstName}</p>
           <p>{creator.lastName}</p>
         </div>
       </div>

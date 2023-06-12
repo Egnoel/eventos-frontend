@@ -7,7 +7,7 @@ export async function fetchWrapper<T=unknown>(input:RequestInfo|URL, init?:Reque
 }
 
 export interface User{
-    id:string;
+    _id:string;
     firstName:string;
     lastName:string;
     email:string;
@@ -20,7 +20,7 @@ export type UserProps={
 }
 
 export interface Event{
-    id:string;
+    _id:string;
     title:string;
     creator:User;
     eventDate:string;
