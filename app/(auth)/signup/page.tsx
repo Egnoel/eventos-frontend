@@ -21,13 +21,24 @@ const Sign = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, firstName, lastName }),
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          favorites: [],
+        }),
       });
       console.log(data.user);
       console.log(data.token);
-      localStorage.setItem('token', JSON.stringify(data.token));
-      localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/');
+
+      if (data.token === undefined) {
+        console.log('token undefined');
+      } else {
+        localStorage.setItem('token', JSON.stringify(data.token));
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/');
+      }
     } catch (error) {
       console.log(error);
     }

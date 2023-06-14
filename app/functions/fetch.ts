@@ -12,6 +12,7 @@ export interface User{
     lastName:string;
     email:string;
     pic:string;
+    favorites:string[];
 }
 
 export type UserProps={
@@ -28,4 +29,5 @@ export interface Event{
     description:string;
     eventpic:string;
     category:string;
+    registrations:string[];
 }

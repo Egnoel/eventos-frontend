@@ -3,10 +3,12 @@ import React, { useCallback, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { User } from '@/app/functions/fetch';
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const info = useCallback(() => {
     setIsOpen(!isOpen);
   }, [isOpen]);
@@ -15,7 +17,7 @@ const Navbar = () => {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.reload();
+    router.push('/login');
   }, []);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ const Navbar = () => {
           <Image
             src={
               user?.pic ||
-              'https://avatars.githubusercontent.com/u/70013986?s=400&u=ea2030c9484b35b134c82ea42c394a8d34c91566&v=4'
+              'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
             }
             alt="user avatar"
             className="object-cover rounded-full "

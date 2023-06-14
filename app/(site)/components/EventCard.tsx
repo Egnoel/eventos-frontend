@@ -1,12 +1,18 @@
 'use client';
 import Image from 'next/image';
 import { HeartIcon } from '@heroicons/react/24/outline';
-import { Event, fetchWrapper } from '@/app/functions/fetch';
+import { Event, User, fetchWrapper } from '@/app/functions/fetch';
 import { useCallback, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const EventCard: React.FC<{ event: Event }> = ({
+const EventCard: React.FC<{
+  event: Event;
+
+  user?: User;
+  onFavoriteClick: (eventId: string) => void;
+  onRemoveFavoriteClick: (eventId: string) => void;
+}> = ({
   event: {
     category,
     creator,
@@ -17,50 +23,30 @@ const EventCard: React.FC<{ event: Event }> = ({
     _id,
     title,
   },
+
+  user,
+  onFavoriteClick,
+  onRemoveFavoriteClick,
 }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
 
   const handleFavoriteClick = useCallback(async () => {
-    console.log(token);
-    try {
-      await axios.post(`http://localhost:8000/api/user/favorites/${_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      setIsFavorite(true);
-      toast.success('Evento adicionado aos favoritos!');
-    } catch (error: any) {
-      console.log(error); // Tratamento de erros, se necessário
-      toast.error('Ocorreu um erro ao adicionar o evento aos favoritos.');
-    }
+    onFavoriteClick(_id);
+    setIsFavorite(true);
   }, [_id]);
 
   const handleRemoveFavoriteClick = useCallback(async () => {
-    try {
-      await axios.delete(`user/favorites/${_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      setIsFavorite(false);
-      toast.success('Evento removido dos favoritos!');
-    } catch (error: any) {
-      console.log(error.response.data); // Tratamento de erros, se necessário
-      toast.error('Ocorreu um erro ao remover o evento dos favoritos.');
-    }
+    onRemoveFavoriteClick(_id);
+    setIsFavorite(false);
   }, [_id]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setToken(JSON.parse(token));
+    if (user && user.favorites && user.favorites.includes(_id)) {
+      setIsFavorite(true);
+    } else {
+      setIsFavorite(false);
     }
-  }, []);
+  }, [user, _id]);
 
   return (
     <div className="flex flex-row w-full gap-12 px-5 py-5 bg-white border border-white shadow-xl rounded-xl hover:shadow-2xl h-[180px]">
