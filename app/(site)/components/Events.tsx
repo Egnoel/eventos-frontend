@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import EventCard from './EventCard';
-import { Event, User, fetchWrapper } from '@/app/functions/fetch';
+import { Event, User, UserProps, fetchWrapper } from '@/app/functions/fetch';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -11,33 +11,30 @@ const Events = () => {
   const [user, setUser] = useState<User>();
 
   const getEvents = async () => {
-    const data = await fetchWrapper<Event[]>('events/');
-
-    setEvents(data);
+    if (token) {
+      const data = await fetchWrapper<Event[]>('events/');
+      setEvents(data);
+      console.log(data);
+    } 
   };
 
   const handleFavoriteClick = async (eventId: string) => {
     if (user) {
       try {
-        const { data } = await axios.post(
-          `http://localhost:8000/api/user/favorites/${eventId}`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const {user, message} = await fetchWrapper<UserProps>(`user/addFav/${eventId}`, {
+          method: 'PUT',
+        });
+        if(user._id !== user._id){
+          throw new Error("Invalid user data");
+        }
+        setUser(user);
+        localStorage.setItem('user', JSON.stringify(user));
 
-        setUser(data);
-        localStorage.setItem('user', JSON.stringify(data));
-
-        console.log(data);
-        toast.success('Evento adicionado aos favoritos!');
+        console.log(user);
+        console.log(message);
       } catch (error: any) {
         console.log(error);
-        toast.error('Ocorreu um erro ao adicionar o evento aos favoritos.');
+        console.log('Ocorreu um erro ao adicionar o evento aos favoritos.');
       }
     }
   };
@@ -45,26 +42,20 @@ const Events = () => {
   const handleRemoveFavoriteClick = async (eventId: string) => {
     if (user) {
       try {
-        await axios.delete(
-          `http://localhost:8000/api/user/favorites/${eventId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const {user, message} = await fetchWrapper<UserProps>(`user/removeFav/${eventId}`, {
+          method: 'PUT',
+        });
+        if(user._id !== user._id){
+          throw new Error("Invalid user data");
+        }
+        setUser(user);
+        localStorage.setItem('user', JSON.stringify(user));
 
-        const updatedUser = {
-          ...user,
-          favorites: user.favorites.filter((id) => id !== eventId),
-        };
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        toast.success('Evento removido dos favoritos!');
+        console.log(user);
+        console.log(message);
       } catch (error: any) {
         console.log(error);
-        toast.error('Ocorreu um erro ao remover o evento dos favoritos.');
+        console.log('Ocorreu um erro ao remover o evento dos favoritos.');
       }
     }
   };
@@ -80,11 +71,16 @@ const Events = () => {
 
   useEffect(() => {
     getEvents();
-    const storedToken = localStorage.getItem('token');
+  }, [token, user]);
+  
+  useEffect(() => {
+    const storedToken: string | null = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
+      console.log(storedToken);
     }
   }, []);
+
   return (
     <div className="flex flex-col h-full gap-4 py-10 pl-10 pr-10 bg-white rounded-xl">
       <p className="text-lg font-bold text-black">Eventos Recentes</p>

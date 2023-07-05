@@ -22,6 +22,9 @@ const EventCard: React.FC<{
     eventpic,
     _id,
     title,
+    favourites,
+    isTransmission,
+    registrations,
   },
 
   user,
@@ -41,7 +44,7 @@ const EventCard: React.FC<{
   }, [_id]);
 
   useEffect(() => {
-    if (user && user.favorites && user.favorites.includes(_id)) {
+    if (user && user.favorites && user.favorites.includes(_id)  && favourites && favourites.includes(user._id)) {
       setIsFavorite(true);
     } else {
       setIsFavorite(false);

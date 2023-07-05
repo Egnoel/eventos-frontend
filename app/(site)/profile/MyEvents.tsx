@@ -3,11 +3,15 @@ import { fetchWrapper } from '@/app/functions/fetch';
 import Event from './Event';
 import { useState, useEffect } from 'react';
 
-const MyEvents = () => {
+interface MyEventsProps{
+  page: string;
+}
+
+const MyEvents:React.FC<MyEventsProps> = ({page}) => {
   const [events, setEvents] = useState<Event[]>([]);
 
   const getEvents = async () => {
-    const data = await fetchWrapper<Event[]>('events/');
+    const data = await fetchWrapper<Event[]>(`events/${page}`);
 
     setEvents(data);
   };

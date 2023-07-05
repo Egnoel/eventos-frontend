@@ -119,7 +119,7 @@ const CreateEvent = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      setToken(JSON.parse(token));
+      setToken((token));
     }
   }, []);
 

@@ -9,16 +9,16 @@ const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const info = useCallback(() => {
-    setIsOpen(!isOpen);
-  }, [isOpen]);
+  const toggleMenu = useCallback(() => {
+    setIsOpen((prevState) => !prevState);
+  }, []);
 
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     router.push('/login');
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const userString: string | null = localStorage.getItem('user');
@@ -35,7 +35,7 @@ const Navbar = () => {
       <div className="flex flex-row items-center gap-2 flex-x-2">
         <p>{user?.firstName}</p>
 
-        <div className="relative cursor-pointer" onClick={info}>
+        <div className="relative cursor-pointer" onClick={toggleMenu}>
           <Image
             src={
               user?.pic ||
@@ -43,8 +43,8 @@ const Navbar = () => {
             }
             alt="user avatar"
             className="object-cover rounded-full "
-            width="50"
-            height={'50'}
+            width={50}
+            height={50}
           />
           {isOpen && (
             <div className="absolute top-16 left-2">

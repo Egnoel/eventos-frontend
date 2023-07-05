@@ -6,7 +6,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { setCookie } from 'cookies-next';
-import { UserProps, fetchWrapper } from '@/app/functions/fetch';
+import { User, UserProps, fetchWrapper } from '@/app/functions/fetch';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,21 +15,17 @@ const Login = () => {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const data = await fetchWrapper<UserProps>('user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const {data} = await axios.post('http://localhost:8000/api/user/login',{email, password},{headers: {'Content-Type': 'application/json'}});
 
       console.log(data.user);
       console.log(data.token);
       if (data.token === undefined) {
         console.log('token undefined');
       } else {
-        localStorage.setItem('token', JSON.stringify(data.token));
-        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', (data.token));
+        const user = await fetchWrapper<User>('user/user');
+        console.log(user);
+        localStorage.setItem('user', JSON.stringify(user));
         router.push('/');
       }
     } catch (error) {

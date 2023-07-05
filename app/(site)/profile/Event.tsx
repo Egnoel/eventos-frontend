@@ -9,12 +9,13 @@ const Event: React.FC<{ event: Event }> = ({
     eventDate,
     eventTime,
     eventpic,
-    id,
+    _id,
     title,
   },
 }) => {
   return (
     <div
+      key={_id}
       style={{ backgroundImage: `url(${eventpic})` }}
       className="flex flex-col px-5 py-5 justify-between h-[350px] w-[270px] rounded-xl bg-no-repeat bg-cover bg-center  bg-fixed"
     >

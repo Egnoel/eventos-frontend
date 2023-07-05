@@ -4,8 +4,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import MyEvents from './MyEvents';
 import CreateEvent from './CreateEvent';
+import { User, fetchWrapper } from '@/app/functions/fetch';
 
 const Profile = () => {
+  const [user, setUser] = useState<User | null>(null);
   const params = useSearchParams();
   const [selectedTab1, setSelectedTab1] = useState(true);
   const [selectedTab2, setSelectedTab2] = useState(false);
@@ -35,9 +37,18 @@ const Profile = () => {
     }
   }, [params, tab3]);
 
+  const getUser = async ()=>{
+    const user = await fetchWrapper<User>('user/user');
+    setUser(user);
+  }
+
+  useEffect(() => {
+    getUser();
+  },[]);
+
   return (
     <div className="flex flex-row items-center gap-10 px-10 py-10">
-      <Avatar />
+      {user && (<Avatar user={user} />)}
       <div className="w-4/5 h-[85vh]  rounded-xl flex flex-col px-5 py-5 gap-5">
         <div className="flex flex-row justify-center w-full gap-10 bg-white rounded-xl h-[45px] items-center">
           <p
@@ -67,10 +78,12 @@ const Profile = () => {
         </div>
         {selectedTab1 && (
           <div id="my">
-            <MyEvents />
+            <MyEvents page="created" />
           </div>
         )}
-        {selectedTab2 && <div>Favoritos</div>}
+        {selectedTab2 &&  <div id="my">
+            <MyEvents page="favourites" />
+          </div>}
         {selectedTab3 && (
           <div id="novo">
             <CreateEvent />
