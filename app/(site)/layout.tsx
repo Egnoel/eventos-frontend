@@ -1,7 +1,7 @@
 import '../globals.css';
-import Navbar from './components/Navbar';
+import NavbarWithDropdown from './components/NavbarWithDropdown';
 import { SocketProvider } from './context/SocketProvider';
-import { ToastContainer } from 'react-toastify';
+
 
 export const metadata = {
   title: 'Kamba Eventos',
@@ -17,9 +17,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="flex flex-col bg-[#f0f5fb]">
         <SocketProvider>
-          <ToastContainer />
-          <Navbar />
+          <NavbarWithDropdown />
+          <div className='w-full h-full px-10 py-20' >
+
           {children}
+          </div>
         </SocketProvider>
       </body>
     </html>

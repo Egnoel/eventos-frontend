@@ -5,6 +5,7 @@ import { Event, User, fetchWrapper } from '@/app/functions/fetch';
 import { useCallback, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import Link from 'next/link';
 
 const EventCard: React.FC<{
   event: Event;
@@ -95,7 +96,9 @@ const EventCard: React.FC<{
             className="w-24 h-8 text-white bg-red-400 rounded-xl "
             type="button"
           >
-            Saiba Mais
+          <Link href={`/${_id}`}>
+          Saiba Mais
+          </Link>
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 import { fetchWrapper } from '@/app/functions/fetch';
 import Event from './Event';
 import { useState, useEffect } from 'react';
+import CardWithDecorativeImage from '../components/Card';
 
 interface MyEventsProps{
   page: string;
@@ -23,7 +24,7 @@ const MyEvents:React.FC<MyEventsProps> = ({page}) => {
   return (
     <div className="flex flex-row flex-wrap w-full gap-10">
       {events.map((event, key) => (
-        <Event key={key} event={event} />
+        <CardWithDecorativeImage key={key} event={event} />
       ))}
     </div>
   );

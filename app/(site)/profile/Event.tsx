@@ -1,5 +1,5 @@
-import { HeartIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
-import { Event, fetchWrapper } from '@/app/functions/fetch';
+import {  TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { Event } from '@/app/functions/fetch';
 
 const Event: React.FC<{ event: Event }> = ({
   event: {

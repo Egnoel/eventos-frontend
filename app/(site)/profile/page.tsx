@@ -11,31 +11,27 @@ const Profile = () => {
   const params = useSearchParams();
   const [selectedTab1, setSelectedTab1] = useState(true);
   const [selectedTab2, setSelectedTab2] = useState(false);
-  const [selectedTab3, setSelectedTab3] = useState(false);
+
   const tab1 = useCallback(() => {
     setSelectedTab1(true);
     setSelectedTab2(false);
-    setSelectedTab3(false);
+
   }, []);
 
   const tab2 = useCallback(() => {
     setSelectedTab1(false);
     setSelectedTab2(true);
-    setSelectedTab3(false);
+
   }, []);
-  const tab3 = useCallback(() => {
-    setSelectedTab1(false);
-    setSelectedTab2(false);
-    setSelectedTab3(true);
-  }, []);
+
 
   useEffect(() => {
     if (params.get('tab') === 'novo') {
-      tab3();
+      tab2();
     } else if (params.get('tab') === 'my') {
       tab1();
     }
-  }, [params, tab3]);
+  }, [params, tab2]);
 
   const getUser = async ()=>{
     const user = await fetchWrapper<User>('user/user');
@@ -65,14 +61,6 @@ const Profile = () => {
             } cursor-pointer`}
             onClick={selectedTab2 ? () => {} : tab2}
           >
-            Favoritos
-          </p>
-          <p
-            className={`${
-              selectedTab3 ? 'border-b-[2px] border-red-400' : ''
-            } cursor-pointer`}
-            onClick={selectedTab3 ? () => {} : tab3}
-          >
             Novo
           </p>
         </div>
@@ -81,10 +69,8 @@ const Profile = () => {
             <MyEvents page="created" />
           </div>
         )}
-        {selectedTab2 &&  <div id="my">
-            <MyEvents page="favourites" />
-          </div>}
-        {selectedTab3 && (
+       
+        {selectedTab2 && (
           <div id="novo">
             <CreateEvent />
           </div>
