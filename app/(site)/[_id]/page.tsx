@@ -5,6 +5,7 @@ import { Event, User, UserProps, fetchWrapper } from '@/app/functions/fetch'
 import Banner from '../components/Banner'
 import Image from 'next/image'
 import Countdown from '../components/Countdown'
+import { useRouter } from 'next/navigation'
 
 const SingleEvent = () => {
     const params = useParams()
@@ -13,11 +14,21 @@ const SingleEvent = () => {
   const [user, setUser] = useState<User>();
     const { _id } = params
     const [event, setEvent] = useState<Event>()
+    const router = useRouter()
     const getEvent = async () => {
       const data = await fetchWrapper<Event>(`events/${_id}`)
       setEvent(data)
       console.log(data)
     }
+
+    const handleStartTransmission = async() => {     
+      try {
+        await fetchWrapper<String>(`events/startLive/${_id}`, {method: 'POST'})
+        router.push(`/room/${_id}`);
+      } catch (error: any) {
+        console.log(error);
+      }
+    };
 
     const handleRegister = async (eventId: string) => {
       if (user) {
@@ -81,7 +92,7 @@ const SingleEvent = () => {
     }, [user, _id]);
 
     useEffect(() => {
-      if (user && user.createdEvents && user.createdEvents.includes(_id)  && event && event.creator ===user) {
+      if (user && user.createdEvents && user.createdEvents.includes(_id) && event && event.creator._id === user._id) {
         setIsCreator(true);
       } else {
         setIsCreator(false);
@@ -91,6 +102,7 @@ const SingleEvent = () => {
     useEffect(() => {
       getEvent()
     }, [_id])
+    console.log(isCreator)
   return (
     <div className='flex flex-col w-full gap-10 px-10 py-10'>
       <div className='flex flex-row justify-between gap-5'>
@@ -107,7 +119,7 @@ const SingleEvent = () => {
         <div className='w-1/5 h-16 bg-gray-500 rounded-md'>
         {event && isCreator ? (
   <div className='flex flex-col items-center justify-center px-4 py-2'>
-    <button type='button'>Start Transmission</button>
+    <button type='button' onClick={handleStartTransmission}>Start Transmission</button>
   </div>
 ) : (
   event && event.isTransmission ? (
