@@ -97,12 +97,13 @@ const SingleEvent = () => {
       } else {
         setIsCreator(false);
       }
+      console.log(isCreator)
     }, [user, _id]);
 
     useEffect(() => {
       getEvent()
     }, [_id])
-    console.log(isCreator)
+   
   return (
     <div className='flex flex-col w-full gap-10 px-10 py-10'>
       <div className='flex flex-row justify-between gap-5'>
@@ -173,16 +174,20 @@ const SingleEvent = () => {
             </span>
            
             
-            {registered && !isCreator ? (
-              <button type='button' onClick={() => handleCancel(_id)}>
-                Cancel
-              </button>
-            ) : (
-              <button type='button' onClick={() => handleRegister(_id)}>
-                Register
-              </button>
-            )
-            }
+            {isCreator ? (
+              <div></div>
+            ):(
+              registered  ? (
+                <button type='button' onClick={() => handleCancel(_id)}>
+                  Cancel
+                </button>
+              ) : (
+                <button type='button' onClick={() => handleRegister(_id)}>
+                  Register
+                </button>
+              )
+              
+            )}
           </div>
         </div>
       </div>

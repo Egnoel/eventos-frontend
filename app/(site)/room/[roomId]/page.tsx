@@ -1,8 +1,9 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react';
+import { isBrowser } from 'react-device-detect';
 import { useParams } from 'next/navigation'
 import io from 'socket.io-client';
-import Hls from 'hls.js';
+import ReactPlayer from 'react-player/lazy'
 import ReactHlsPlayer from 'react-hls-player';
 import { fetchWrapper } from '@/app/functions/fetch';
 import { useRouter } from 'next/navigation'
@@ -12,7 +13,8 @@ const Room = () => {
   const { roomId } = params
   const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hls, setHls] = useState<Hls | null>(null);
+  const [url,setUrl] = useState('')
+
 
   const [messages, setMessages] = useState<string[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -32,31 +34,10 @@ const Room = () => {
     }
   }, [roomId]);
 
-  const initializeHls = () => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      if (Hls.isSupported()) {
-        const newHls = new Hls();
-        newHls.attachMedia(video);
-        newHls.on(Hls.Events.MEDIA_ATTACHED, () => {
-          newHls.loadSource(`http://localhost:8080/live/${roomId}.flv`);
-        });
-        setHls(newHls);
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = `http://localhost:8080/live/${roomId}.flv`;
-      }
-    }
-  };
-
   useEffect(() => {
-    initializeHls();
-
-    return () => {
-      if (hls) {
-        hls.destroy();
-      }
-    };
+    setUrl(`http://localhost:8080/live/${roomId}/index.m3u8`)
   }, []);
+  
 
   const sendMessage = () => {
     if (roomId && newMessage) {
@@ -66,13 +47,13 @@ const Room = () => {
     }
   };
   const hlsPlayerProps = {
-    src: `http://localhost:8080/live/${roomId}.flv`,
+    src: `http://localhost:8080/live/${roomId}/index.m3u8`,
     autoPlay: true,
     playerRef: videoRef,
   };
   const handleStopTransmission = async() => {     
     try {
-      await fetchWrapper<String>(`events/startLive/${roomId}`, {})
+      await fetchWrapper<String>(`events/stopLive/${roomId}`, {method: 'POST'})
       router.push(`/${roomId}`);
     } catch (error: any) {
       console.log(error);
@@ -82,12 +63,8 @@ const Room = () => {
   return (
     <div className='flex flex-row w-full h-full gap-5 px-5 py-5'>
       <div className='w-4/5 bg-slate-500'>
-        {hls ? (
-          <video ref={videoRef} controls />
-        ) : (
-          <ReactHlsPlayer {...hlsPlayerProps} />
-        )}
-         <button type='button' onClick={handleStopTransmission}>Stop</button>
+      <ReactHlsPlayer playerRef={videoRef} src={url} autoPlay controls />
+        
       </div>
      
       <div className='w-1/5 bg-slate-300'>
@@ -107,7 +84,8 @@ const Room = () => {
             Enviar
           </button>
         </div>
-      b</div>
+      </div>
+      <button type='button' onClick={handleStopTransmission}>Stop</button>
     </div>
   );
 };
