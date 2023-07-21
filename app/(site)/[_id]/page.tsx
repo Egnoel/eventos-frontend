@@ -6,6 +6,7 @@ import Banner from '../components/Banner'
 import Image from 'next/image'
 import Countdown from '../components/Countdown'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const SingleEvent = () => {
     const params = useParams()
@@ -75,34 +76,37 @@ const SingleEvent = () => {
 
 
     useEffect(() => {
+      const getEvent = async () => {
+        const data = await fetchWrapper<Event>(`events/${_id}`)
+        setEvent(data)
+        console.log(data)
+  
+        // Verificar se o usuário está registrado no evento e se é o criador
+        if (user && user.signedEvents && user.signedEvents.includes(_id) && data && data.registrations.includes(user._id)) {
+          setRegistered(true);
+        } else {
+          setRegistered(false);
+        }
+  
+        if (user && user.createdEvents && user.createdEvents.includes(_id) && data && data.creator._id === user._id) {
+          setIsCreator(true);
+        } else {
+          setIsCreator(false);
+        }
+      }
+  
+      getEvent();
+    }, [_id, user]);
+  
+    // useEffect para verificar o usuário logado
+    useEffect(() => {
       const userString: string | null = localStorage.getItem('user');
       if (userString) {
         const parsedUser: User = JSON.parse(userString);
         setUser(parsedUser);
-       
+        console.log(parsedUser)
       }
     }, []);
-
-    useEffect(() => {
-      if (user && user.signedEvents && user.signedEvents.includes(_id)  && event && event.registrations.includes(user._id)) {
-        setRegistered(true);
-      } else {
-        setRegistered(false);
-      }
-    }, [user, _id]);
-
-    useEffect(() => {
-      if (user && user.createdEvents && user.createdEvents.includes(_id) && event && event.creator._id === user._id) {
-        setIsCreator(true);
-      } else {
-        setIsCreator(false);
-      }
-      console.log(isCreator)
-    }, [user, _id]);
-
-    useEffect(() => {
-      getEvent()
-    }, [_id])
    
   return (
     <div className='flex flex-col w-full gap-10 px-10 py-10'>
@@ -126,7 +130,7 @@ const SingleEvent = () => {
   event && event.isTransmission ? (
     <div className='flex flex-col items-center justify-center px-4 py-2'>
       <p>Event has started</p>
-      <button type='button'>Join Now</button>
+      <Link href={`/room/${_id}`}>Join Now</Link>
     </div>
   ) : (
     <div className='flex items-center justify-center py-4'>
@@ -145,7 +149,7 @@ const SingleEvent = () => {
               <div className='flex flex-col gap-2'>
                 <p>Creator</p>
                 <div className='flex flex-row items-center gap-2'>
-                  <Image src={event? event.creator.pic : ""} width={20} height={20} alt='creator image' className='rounded-full' />
+                  <Image src={event? event.creator.pic : "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"} width={20} height={20} alt='creator image' className='rounded-full' />
                   <p>{event? `${event.creator.firstName} ${event.creator.lastName}` : ""}</p>
                 </div>
               </div>
