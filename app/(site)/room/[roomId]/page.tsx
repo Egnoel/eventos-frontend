@@ -45,7 +45,7 @@ const Room = () => {
   useEffect(() => {
     setUrl(`http://localhost:8080/live/${roomId}/index.m3u8`);
     
-  }, []);
+  }, [url]);
   
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const Room = () => {
   return (
     <div className='relative flex flex-row w-full h-full gap-5 px-5 py-5 mt-2'>
       <div className='w-4/5 bg-slate-500'>
-      <ReactHlsPlayer playerRef={videoRef} src={url} autoPlay controls width={'100%'} />
+      <ReactHlsPlayer playerRef={videoRef} src={url} autoPlay controls width={'100%'} muted />
         
       </div>
      

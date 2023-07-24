@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Countdown from '../components/Countdown'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import OBSWebSocket from 'obs-websocket-js';
 
 const SingleEvent = () => {
     const params = useParams()
@@ -16,16 +17,27 @@ const SingleEvent = () => {
     const { _id } = params
     const [event, setEvent] = useState<Event>()
     const router = useRouter()
-    const getEvent = async () => {
-      const data = await fetchWrapper<Event>(`events/${_id}`)
-      setEvent(data)
-      console.log(data)
-    }
+    const [obs, setObs] = useState<OBSWebSocket | null>(null);
+  
 
     const handleStartTransmission = async() => {     
       try {
         await fetchWrapper<String>(`events/startLive/${_id}`, {method: 'POST'})
+      console.log("teste")
+      if(obs){
+        obs.call('SetStreamServiceSettings', {
+          streamServiceType: 'rtmp_custom',
+          streamServiceSettings: {
+            key: `${_id}`, // Use o ID do evento como parte da chave de transmissão
+          },
+        });
+        obs.call('StartStream'); 
         router.push(`/room/${_id}`);
+      }
+     
+     
+                                          
+       
       } catch (error: any) {
         console.log(error);
       }
@@ -73,6 +85,23 @@ const SingleEvent = () => {
       }
     };
 
+    useEffect(() => {
+      const newObs = new OBSWebSocket();
+      newObs.connect('ws://127.0.0.1:4455' ) // Altere o endereço para o que estiver configurado no OBS WebSocket Plugin
+        .then(() => {
+          console.log('Conexão com o OBS Studio estabelecida.');
+          setObs(newObs);
+        })
+        .catch((error) => {
+          console.log('Erro ao conectar com o OBS Studio:', error);
+        });
+  
+      return () => {
+        if (newObs) {
+          newObs.disconnect();
+        }
+      };
+    }, []);
 
 
     useEffect(() => {
