@@ -87,7 +87,7 @@ const SingleEvent = () => {
 
     useEffect(() => {
       const newObs = new OBSWebSocket();
-      newObs.connect('ws://127.0.0.1:4455' ) // Altere o endereço para o que estiver configurado no OBS WebSocket Plugin
+      newObs.connect('ws://localhost:4455' ) // Altere o endereço para o que estiver configurado no OBS WebSocket Plugin
         .then(() => {
           console.log('Conexão com o OBS Studio estabelecida.');
           setObs(newObs);

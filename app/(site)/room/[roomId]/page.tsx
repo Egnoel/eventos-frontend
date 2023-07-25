@@ -3,7 +3,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { isBrowser } from 'react-device-detect';
 import { useParams } from 'next/navigation'
 import io, {Socket} from 'socket.io-client';
-import ReactPlayer from 'react-player/lazy'
 import ReactHlsPlayer from 'react-hls-player';
 import { User, fetchWrapper } from '@/app/functions/fetch';
 import { useRouter } from 'next/navigation'
@@ -15,10 +14,29 @@ const Room = () => {
   const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null);
   const [url,setUrl] = useState('')
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [hlsPlaylist, setHlsPlaylist] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHlsPlaylist = async () => {
+      try {
+        // Substitua pelo ID do evento real
+        const response = await fetch(`http://localhost:8000/live/${roomId}/index.m3u8`);
+       console.log(response.url)
+       
+       setHlsPlaylist(response.url);
+       
+      } catch (error) {
+        console.error(error);
+        // Lidar com o erro de forma apropriada, por exemplo, exibindo uma mensagem de erro para o usuário
+      }
+    };
+
+    fetchHlsPlaylist();
+  }, [roomId]);
 
   useEffect(() => {
     if (roomId) {
@@ -83,10 +101,14 @@ const Room = () => {
 
   return (
     <div className='relative flex flex-row w-full h-full gap-5 px-5 py-5 mt-2'>
-      <div className='w-4/5 bg-slate-500'>
-      <ReactHlsPlayer playerRef={videoRef} src={url} autoPlay controls width={'100%'} muted />
+      
+      {hlsPlaylist && ( // Render the ReactHlsPlayer component only if hlsPlaylist is available
+        <div className='w-4/5 bg-slate-500'>
+          <ReactHlsPlayer playerRef={videoRef} src={url} autoPlay controls width='100%' muted />
+        </div>
+      )}
         
-      </div>
+   
      
       <div className='w-1/5 bg-slate-300 max-h-[490px]  '>
         <div className='flex flex-col w-full h-full gap-2 px-3 py-2 overflow-auto'>
